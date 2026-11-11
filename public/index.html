@@ -368,9 +368,15 @@ socket.on('roomUpdate', (room) => {
 });
 function startOnlineGame(){
 isSpectator=false;
-document.getElementById('chatPanel').style.display='block';
+match={white:"Player 1",black:"Player 2",over:false,result:"",reason:"",tournament:false,fixtureIndex:-1};
+game=new Chess();
+viewIndex=0;
+selected=null;
+flipped=false;
+document.getElementById('chat').innerHTML="";
 go('play');
 showGameScreen();
+render();
 }
 function startSpectatorMode(){
 isSpectator=true;
