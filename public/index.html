@@ -5,37 +5,36 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Demon Chess</title>
 <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js"></script>
-<script>if(typeof Chess==="undefined"){document.write('<script src="https://unpkg.com/chess.js@0.10.3/chess.min.js"><\/script>')}</script>
-<script>if(typeof Chess==="undefined"){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"><\/script>')}</script>
+<script src="/socket.io/socket.io.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Arial}
-body{background:#0a0709;color:#e9e2d2}
-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:#140a0e;border-bottom:2px solid #7a1020;flex-wrap:wrap}
-.logo{font-weight:900;font-size:22px;color:#e8b84b}.logo span{color:#c62839}
+body{background:#0b1220;color:#e6edf7}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:#0f1a30;border-bottom:2px solid #1e3a6e;flex-wrap:wrap}
+.logo{font-weight:900;font-size:22px;color:#5eead4}.logo span{color:#3b82f6}
 nav{display:flex;gap:14px;flex-wrap:wrap}
-nav a{color:#c9bfa8;text-decoration:none;font-weight:700}
-nav a.active{color:#e8b84b;border-bottom:2px solid #c62839}
+nav a{color:#a9b8d3;text-decoration:none;font-weight:700}
+nav a.active{color:#5eead4;border-bottom:2px solid #3b82f6}
 main{max-width:1150px;margin:auto;padding:16px}
-.card,.panel{background:#161017;border:1px solid #331d24;border-radius:14px;padding:16px}
+.card,.panel{background:#111b31;border:1px solid #223356;border-radius:14px;padding:16px}
 .card{margin-bottom:14px}
-h1,h2,h3{color:#e8b84b;margin-bottom:10px}
-button{background:#c62839;color:#fff;border:0;border-radius:8px;padding:9px 13px;font-weight:800;cursor:pointer}
-button.ghost{background:#241820;border:1px solid #55303a;color:#e9e2d2}
-input{background:#0d0a0e;color:#e9e2d2;border:1px solid #55303a;border-radius:8px;padding:9px;width:100%;margin:6px 0}
+h1,h2,h3{color:#5eead4;margin-bottom:10px}
+button{background:#3b82f6;color:#fff;border:0;border-radius:8px;padding:9px 13px;font-weight:800;cursor:pointer}
+button.ghost{background:#1a2742;border:1px solid #34507f;color:#e6edf7}
+input{background:#0a1428;color:#e6edf7;border:1px solid #34507f;border-radius:8px;padding:9px;width:100%;margin:6px 0}
 .hidden{display:none!important}
-.banner{background:linear-gradient(90deg,#3d0d18,#120709);border:1px solid #7a1020;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px}
-.hero{background:linear-gradient(135deg,#2a0b12,#120709);border:1px solid #7a1020;border-radius:16px;padding:26px;text-align:center;margin-bottom:14px}
+.banner{background:linear-gradient(90deg,#12306b,#0a1428);border:1px solid #1e3a6e;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,#10264f,#0a1428);border:1px solid #1e3a6e;border-radius:16px;padding:26px;text-align:center;margin-bottom:14px}
 .hero h1{font-size:34px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .top2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.feature{background:#161017;border:1px solid #331d24;border-radius:14px;padding:16px;text-align:center}
-.feature h3{color:#e8b84b}
-.board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(94vw,560px);aspect-ratio:1;border:4px solid #7a1020;border-radius:10px;overflow:hidden}
+.feature{background:#111b31;border:1px solid #223356;border-radius:14px;padding:16px;text-align:center}
+.feature h3{color:#5eead4}
+.board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(94vw,560px);aspect-ratio:1;border:4px solid #1e3a6e;border-radius:10px;overflow:hidden}
 .sq{display:flex;align-items:center;justify-content:center;cursor:pointer;aspect-ratio:1}
-.light{background:#e9dab4}.dark{background:#5d2029}
+.light{background:#eeeed2}.dark{background:#769656}
 .sq img{width:88%;height:88%;pointer-events:none}
-.sel{box-shadow:inset 0 0 0 3px #e8b84b}
-.move{box-shadow:inset 0 0 0 3px #35c46a}
+.sel{box-shadow:inset 0 0 0 4px #facc15}
+.move{box-shadow:inset 0 0 0 4px #38bdf8}
 .game{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .left{flex:2;min-width:300px}.right{flex:1;min-width:300px}
 .caps{font-size:16px;min-height:30px;display:flex;gap:2px;align-items:center;flex-wrap:wrap}
@@ -43,19 +42,29 @@ input{background:#0d0a0e;color:#e9e2d2;border:1px solid #55303a;border-radius:8p
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .moves{max-height:220px;overflow:auto;font-family:monospace}
 .moves div{padding:5px 7px;border-radius:6px;cursor:pointer}
-.moves div:hover{background:#241820}
-.moves .cur{background:#3d1520;color:#e8b84b}
+.moves div:hover{background:#1a2742}
+.moves .cur{background:#153363;color:#5eead4}
 .emotes{display:flex;gap:8px;font-size:20px;flex-wrap:wrap}
-.emotes button{background:#241820;border:1px solid #55303a}
-.status{margin-top:8px;color:#e8b84b;font-weight:700}
+.emotes button{background:#1a2742;border:1px solid #34507f}
+.status{margin-top:8px;color:#5eead4;font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px;border-bottom:1px solid #331d24;text-align:left;white-space:nowrap}
-th{color:#e8b84b;cursor:pointer}
+th,td{padding:8px;border-bottom:1px solid #223356;text-align:left;white-space:nowrap}
+th{color:#5eead4;cursor:pointer}
 .modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:9}
 .modal .card{width:min(92vw,420px);text-align:center;max-height:90vh;overflow:auto}
 .promo{display:flex;gap:10px;justify-content:center;margin-top:12px}
 .promo img{width:54px;height:54px;cursor:pointer}
+.online-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.online-actions button{flex:1;min-width:100px}
+.online-box{margin-top:12px;padding:12px;border:1px solid #34507f;border-radius:10px;background:#0c1730}
+.room-code{font-size:26px;font-weight:900;color:#5eead4;letter-spacing:2px}
 @media(max-width:760px){.game{flex-direction:column}.board{width:100%}.top2{grid-template-columns:1fr}}
+#tStatsTable,#oStatsTable{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+.stats{min-width:max-content}
+.stats th{background:#0c1730}
+.stats th:first-child,.stats td:first-child{position:sticky;left:0;background:#111b31;z-index:1;font-weight:800;border-right:1px solid #223356}
+.stats th:first-child{background:#0c1730}
+@media(max-width:760px){.stats th,.stats td{padding:7px 9px;font-size:12px}}
 </style>
 </head>
 <body>
@@ -82,15 +91,47 @@ th{color:#e8b84b;cursor:pointer}
 <div class="feature"><h3>🎬 Game Review</h3><p>Replay games and see move quality.</p><button onclick="go('history')">Open</button></div>
 </div>
 </section>
+
 <section id="play" class="hidden">
+
+<div id="setupCards">
 <div class="card">
-<h2>New Rated Match</h2>
-<input id="p1" placeholder="Your name">
-<input id="p2" placeholder="Opponent name (same device)">
+<h2>Online Match</h2>
+<p>Create a room and share the code. Another player joins. Everyone else can spectate.</p>
+<input id="onlineName" placeholder="Your name">
+<div class="online-actions">
+<button onclick="createOnlineRoom()">Start Match</button>
+<button class="ghost" onclick="showJoinRoom()">Join</button>
+<button class="ghost" onclick="showSpectateRoom()">Spectate</button>
+</div>
+<div id="hostRoom" class="online-box hidden">
+<p>Room Code</p>
+<div class="room-code" id="hostCode"></div>
+<p>Share this code with the other player.</p>
+<button class="ghost" onclick="copyRoomLink()">Copy Invite Link</button>
+<p class="status" id="waitingText">Waiting for opponent…</p>
+</div>
+<div id="joinRoom" class="online-box hidden">
+<input id="joinCodeInput" placeholder="Enter room code">
+<button onclick="joinAsPlayer()">Join Match</button>
+</div>
+<div id="spectateRoom" class="online-box hidden">
+<input id="spectateCodeInput" placeholder="Enter room code">
+<button onclick="joinAsSpectator()">Spectate Match</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Offline Match</h2>
+<input id="p1" placeholder="Player 1 name">
+<input id="p2" placeholder="Player 2 name">
 <button onclick="startMatch()">Start Match</button>
 <p class="status">Tap your piece, then tap the square where you want to move.</p>
 </div>
+</div>
+
 <div id="gameUI" class="hidden">
+<div class="row" style="margin:0 0 12px"><button class="ghost" onclick="leaveMatch()">← Back to menu</button></div>
 <div class="game">
 <div class="left">
 <div class="panel"><b id="topName"></b><div class="caps" id="topCaps"></div></div>
@@ -110,12 +151,14 @@ th{color:#e8b84b;cursor:pointer}
 <button onclick="emote('😀')">😀</button><button onclick="emote('😂')">😂</button><button onclick="emote('😮')">😮</button><button onclick="emote('🔥')">🔥</button>
 <button onclick="emote('👏')">👏</button><button onclick="emote('🤝')">🤝</button><button onclick="emote('💀')">💀</button><button onclick="emote('♟️')">♟️</button>
 </div></div>
-<div class="panel"><b>Chat</b><div id="chat" class="moves"></div><input id="msg" placeholder="Type a message…"><button onclick="sendMsg()">Send</button></div>
+<div class="panel" id="chatPanel"><b>Chat</b><div id="chat" class="moves"></div><input id="msg" placeholder="Type a message…"><button onclick="sendMsg()">Send</button></div>
 <div class="panel"><b>Moves</b><div id="moves" class="moves"></div></div>
 </div>
 </div>
 </div>
+
 </section>
+
 <section id="replay" class="hidden">
 <div class="game">
 <div class="left">
@@ -134,6 +177,7 @@ th{color:#e8b84b;cursor:pointer}
 </div>
 </div>
 </section>
+
 <section id="tournaments" class="hidden">
 <div class="card">
 <h2>Tournament</h2>
@@ -146,19 +190,25 @@ th{color:#e8b84b;cursor:pointer}
 <div class="card"><h2>Standings</h2><div id="standings"></div></div>
 <div class="card"><h2>Final</h2><div id="final"></div></div>
 </section>
+
 <section id="leaderboard" class="hidden">
 <div class="card"><h2>Tournament Stats</h2><input id="tsearch" placeholder="Search player" oninput="renderStats()"><div id="tStatsTable"></div></div>
 <div class="card"><h2>Overall Stats</h2><input id="osearch" placeholder="Search player" oninput="renderStats()"><div id="oStatsTable"></div></div>
 </section>
+
 <section id="history" class="hidden"><div class="card"><h2>Match History</h2><div id="hist"></div></div></section>
+
 <section id="profile" class="hidden">
 <div class="card"><h2>Profile</h2><input id="pname" placeholder="Your name"><button onclick="saveProfile()">Save</button><div id="hostArea"></div></div>
 <div class="card"><h2>My Overall Stats</h2><div id="myOverall"></div></div>
 <div class="card"><h2>My Tournament Stats</h2><div id="myTournament"></div></div>
 </section>
+
 </main>
+
 <div id="promoModal" class="modal" style="display:none"><div class="card"><h3>Choose Promotion</h3><div class="promo" id="promoChoices"></div></div></div>
 <div id="endModal" class="modal" style="display:none"><div class="card"><h3 id="endTitle"></h3><p id="endReason"></p><p id="endCounts"></p><button onclick="watchReplay()">Watch Replay</button></div></div>
+
 <script>
 let game=(typeof Chess!=="undefined")?new Chess():null;
 let viewIndex=0,selected=null,flipped=false,pendingPromo=null;
@@ -169,6 +219,7 @@ let tournament=JSON.parse(localStorage.getItem("dc_tournament")||'{"players":[],
 let match={white:"",black:"",over:false,result:"",reason:"",tournament:false,fixtureIndex:-1};
 let replay={moves:[],index:0,tags:[],white:"",black:""};
 let lastRecord=null;
+let isSpectator=false;
 const pieceImg=(c,p)=>`https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${c}${p}.png`;
 const value={p:1,n:3,b:3,r:5,q:9,k:0};
 const disp=v=>v??"—";
@@ -183,7 +234,10 @@ let champ=null;
 if(tournament.done&&tournament.players.length){let rows=tournament.players.map(p=>({p,pts:tournament.results[p]||0})).sort((a,b)=>b.pts-a.pts);champ=rows[0]?.p}
 document.getElementById("gm").textContent=champ?`👑 Today’s Grandmaster: ${champ} — ${disp(getPlayer(champ).elo)} Elo`:"No tournament finished yet";
 }
-function startMatch(){if(!game)return alert("Chess engine failed to load. Check your internet and refresh.");let a=document.getElementById("p1").value.trim(),b=document.getElementById("p2").value.trim();if(!a||!b||a.toLowerCase()==b.toLowerCase())return alert("Enter two different player names");let colors=Math.random()<.5?[a,b]:[b,a];match={white:colors[0],black:colors[1],over:false,result:"",reason:"",tournament:match.tournament,fixtureIndex:match.fixtureIndex};getPlayer(a);getPlayer(b);saveAll();game=new Chess();viewIndex=0;flipped=false;selected=null;document.getElementById("gameUI").classList.remove("hidden");document.getElementById("chat").innerHTML="";render();alert(`Colors assigned randomly:\n${match.white} is White\n${match.black} is Black`)}
+function startMatch(){if(!game)return alert("Chess engine failed to load. Check your internet and refresh.");let a=document.getElementById("p1").value.trim(),b=document.getElementById("p2").value.trim();if(!a||!b||a.toLowerCase()==b.toLowerCase())return alert("Enter two different player names");let colors=Math.random()<.5?[a,b]:[b,a];match={white:colors[0],black:colors[1],over:false,result:"",reason:"",tournament:match.tournament,fixtureIndex:match.fixtureIndex};getPlayer(a);getPlayer(b);saveAll();game=new Chess();viewIndex=0;flipped=false;selected=null;isSpectator=false;showGameScreen();document.getElementById("chat").innerHTML="";render();alert(`Colors assigned randomly:\n${match.white} is White\n${match.black} is Black`)}
+function showGameScreen(){document.getElementById("setupCards").classList.add("hidden");document.getElementById("gameUI").classList.remove("hidden");window.scrollTo(0,0)}
+function showSetup(){document.getElementById("gameUI").classList.add("hidden");document.getElementById("setupCards").classList.remove("hidden");window.scrollTo(0,0)}
+function leaveMatch(){if(!isSpectator&&game&&!match.over&&game.history().length&&!confirm("Leave this match? No result will be saved."))return;match.over=true;if(typeof Chess!=="undefined")game=new Chess();viewIndex=0;selected=null;showSetup()}
 function capsHtml(side,moves){
 let opp=side=="w"?"b":"w";
 let list=moves.slice(0,viewIndex).filter(m=>m.captured&&m.color==side).map(m=>m.captured);
@@ -195,7 +249,7 @@ document.getElementById("bottomCaps").innerHTML="Captured: "+capsHtml(flipped?"b
 document.getElementById("topName").textContent=(flipped?match.white:match.black)+" • "+(flipped?"White":"Black");
 document.getElementById("bottomName").textContent=(flipped?match.black:match.white)+" • "+(flipped?"Black":"White");
 let s=document.getElementById("status");if(match.over)s.textContent=match.result+" • "+match.reason;else if(game.in_checkmate())s.textContent="Checkmate!";else if(game.in_stalemate())s.textContent="Stalemate — Draw";else if(game.in_check())s.textContent="Check!";else s.textContent=(game.turn()=="w"?match.white:match.black)+" to move"}
-function click(sq){if(!game)return;if(viewIndex!=game.history().length)return;let piece=game.get(sq);if(piece&&piece.color==game.turn()){if(selected==sq){selected=null;render();return}selected=sq;render();return}if(selected){let mv=game.moves({square:selected,verbose:true}).find(m=>m.to==sq);if(mv){if(mv.flags.includes("p")){pendingPromo={from:selected,to:sq};showPromo();return}game.move({from:selected,to:sq});selected=null;viewIndex=game.history().length;render();checkEnd();return}}selected=null;render()}
+function click(sq){if(!game)return;if(isSpectator)return;if(viewIndex!=game.history().length)return;let piece=game.get(sq);if(piece&&piece.color==game.turn()){if(selected==sq){selected=null;render();return}selected=sq;render();return}if(selected){let mv=game.moves({square:selected,verbose:true}).find(m=>m.to==sq);if(mv){if(mv.flags.includes("p")){pendingPromo={from:selected,to:sq};showPromo();return}game.move({from:selected,to:sq});selected=null;viewIndex=game.history().length;render();checkEnd();return}}selected=null;render()}
 function showPromo(){document.getElementById("promoModal").style.display="flex";document.getElementById("promoChoices").innerHTML=["q","r","b","n"].map(p=>`<img src="${pieceImg(game.turn(),p)}" onclick="choosePromo('${p}')">`).join("")}
 function choosePromo(p){document.getElementById("promoModal").style.display="none";game.move({from:pendingPromo.from,to:pendingPromo.to,promotion:p});pendingPromo=null;viewIndex=game.history().length;render();checkEnd()}
 function nav(d){if(!game)return;viewIndex=Math.max(0,Math.min(game.history().length,viewIndex+d));showView()}
@@ -203,9 +257,9 @@ function jump(i){viewIndex=i;showView()}
 function showView(){if(!game)return;let g=new Chess();game.history().slice(0,viewIndex).forEach(m=>g.move(m));let old=game;game=g;render();game=old}
 function flip(){flipped=!flipped;render()}
 function emote(e){document.getElementById("chat").innerHTML+=`<div><b>${profile.name||"Player"}:</b> ${e}</div>`}
-function sendMsg(){let m=document.getElementById("msg").value.trim();if(!m)return;document.getElementById("chat").innerHTML+=`<div><b>${profile.name||"Player"}:</b> ${m}</div>`;document.getElementById("msg").value=""}
-function resign(){if(!game||match.over)return;if(confirm("Resign?"))endGame(game.turn()=="w"?match.black:match.white,"resignation")}
-function drawOffer(){if(!game||match.over)return;if(confirm("Opponent accepts draw?"))endGame("Draw","agreement")}
+function sendMsg(){if(isSpectator)return alert("Spectators can only send emotes.");let m=document.getElementById("msg").value.trim();if(!m)return;document.getElementById("chat").innerHTML+=`<div><b>${profile.name||"Player"}:</b> ${m}</div>`;document.getElementById("msg").value=""}
+function resign(){if(!game||match.over)return;if(isSpectator)return alert("Spectators cannot resign.");if(confirm("Resign?"))endGame(game.turn()=="w"?match.black:match.white,"resignation")}
+function drawOffer(){if(!game||match.over)return;if(isSpectator)return alert("Spectators cannot offer draw.");if(confirm("Opponent accepts draw?"))endGame("Draw","agreement")}
 function checkEnd(){if(!game)return;if(game.in_checkmate())endGame(game.turn()=="w"?match.black:match.white,"checkmate");else if(game.in_stalemate())endGame("Draw","stalemate");else if(game.insufficient_material())endGame("Draw","insufficient material");else if(game.in_threefold_repetition())endGame("Draw","threefold repetition")}
 function material(g,color){let s=0;g.board().flat().forEach(x=>{if(x&&x.color==color)s+=value[x.type]});return s}
 function classifyMoves(movesList){let g=new Chess(),tags=[];movesList.forEach(san=>{let mover=g.turn();let before=material(g,mover);let mv=g.move(san);let after=material(g,mover);let hung=false;g.moves({verbose:true}).forEach(m=>{if(m.captured&&value[m.captured]>=value[m.piece])hung=true});let tag="Good";if(g.in_checkmate())tag="Brilliant";else if(hung&&value[mv.piece]>=5)tag="Blunder";else if(hung)tag="Mistake";else if(mv.captured||g.in_check())tag="Great";else if(after>before)tag="Excellent";else tag="Good";tags.push(tag)});return tags}
@@ -220,7 +274,7 @@ let tags=classifyMoves(game.history());
 let counts={Brilliant:0,Great:0,Excellent:0,Good:0,Mistake:0,Blunder:0};tags.forEach(t=>counts[t]++);
 let rec={date:new Date().toLocaleString(),white:match.white,black:match.black,result:match.result,reason,moves:game.history().length,movesList:game.history(),tags,counts,whiteElo:w.elo,blackElo:b.elo,whiteChange:w.elo-oldW,blackChange:b.elo-oldB,tournament:match.tournament};
 history.unshift(rec);saveAll();match.tournament=false;match.fixtureIndex=-1;
-document.getElementById("gameUI").classList.add("hidden");
+showSetup();
 game=new Chess();viewIndex=0;selected=null;
 lastRecord=rec;
 document.getElementById("endTitle").textContent=rec.result;
@@ -240,22 +294,81 @@ function replayJump(i){replay.index=i;renderReplay()}
 function addTPlayer(){let n=document.getElementById("tname").value.trim();if(!n)return;tournament.players.push(n);document.getElementById("tname").value="";saveAll();renderTournament()}
 function createTournament(){if(tournament.players.length<2)return alert("Add at least 2 players");tournament.fixtures=[];tournament.results={};tournament.done=false;for(let i=0;i<tournament.players.length;i++)for(let j=i+1;j<tournament.players.length;j++)tournament.fixtures.push([tournament.players[i],tournament.players[j]]);saveAll();renderTournament()}
 function renderTournament(){document.getElementById("tplayers").innerHTML=tournament.players.map(p=>`<div>• ${p}</div>`).join("");document.getElementById("fixtures").innerHTML=tournament.fixtures.map((f,i)=>`<div class="panel">${f[0]} vs ${f[1]} <button onclick="playFixture(${i})">Play</button> <button class="ghost" onclick="recordResult(${i},'${f[0]}')">Win</button> <button class="ghost" onclick="recordResult(${i},'Draw')">Draw</button></div>`).join("")||"No fixtures yet";let rows=tournament.players.map(p=>({p,pts:tournament.results[p]||0})).sort((a,b)=>b.pts-a.pts);document.getElementById("standings").innerHTML=`<table><tr><th>Player</th><th>Points</th></tr>${rows.map(r=>`<tr><td>${r.p}</td><td>${r.pts}</td></tr>`).join("")}</table>`;document.getElementById("final").textContent=tournament.done?"Tournament complete.":"Complete all league matches to advance the top 2."}
-function playFixture(i){let f=tournament.fixtures[i];document.getElementById("p1").value=f[0];document.getElementById("p2").value=f[1];match.tournament=true;match.fixtureIndex=i;go("play")}
+function playFixture(i){let f=tournament.fixtures[i];document.getElementById("p1").value=f[0];document.getElementById("p2").value=f[1];match.tournament=true;match.fixtureIndex=i;showSetup();go("play")}
 function recordResult(i,winner){let f=tournament.fixtures[i];if(!f)return;if(winner=="Draw"){tournament.results[f[0]]=(tournament.results[f[0]]||0)+1;tournament.results[f[1]]=(tournament.results[f[1]]||0)+1}else tournament.results[winner]=(tournament.results[winner]||0)+3;tournament.fixtures.splice(i,1);finishTournament();saveAll();renderTournament()}
 function renderStats(){let tq=(document.getElementById("tsearch").value||"").toLowerCase();let oq=(document.getElementById("osearch").value||"").toLowerCase();
 let tRows=players.filter(p=>p.name.toLowerCase().includes(tq)).map(p=>({p:p.name,m:p.tMatches,w:p.tWins,l:p.tLosses,d:p.tDraws,wr:p.tMatches?Math.round(p.tWins/p.tMatches*100)+"%":"0%",avg:p.tMatches?Math.round(p.eloSum/p.matches):"—",best:disp(p.tBest),tp:tournament.results[p.name]||0}));
-document.getElementById("tStatsTable").innerHTML=`<table><tr><th>Player</th><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Average Elo</th><th>Best Elo</th><th>Tournament points</th></tr>${tRows.map(r=>`<tr><td>${r.p}</td><td>${r.m}</td><td>${r.w}</td><td>${r.l}</td><td>${r.d}</td><td>${r.wr}</td><td>${r.avg}</td><td>${r.best}</td><td>${r.tp}</td></tr>`).join("")}</table>`;
+document.getElementById("tStatsTable").innerHTML=`<table class="stats"><tr><th>Player</th><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Average Elo</th><th>Best Elo</th><th>Tournament points</th></tr>${tRows.map(r=>`<tr><td data-label="Player">${r.p}</td><td data-label="Matches">${r.m}</td><td data-label="Wins">${r.w}</td><td data-label="Losses">${r.l}</td><td data-label="Draws">${r.d}</td><td data-label="Win rate">${r.wr}</td><td data-label="Average Elo">${r.avg}</td><td data-label="Best Elo">${r.best}</td><td data-label="Tournament points">${r.tp}</td></tr>`).join("")}</table>`;
 let oRows=players.filter(p=>p.name.toLowerCase().includes(oq)).map(p=>({p:p.name,m:p.matches,w:p.wins,l:p.losses,d:p.draws,wr:p.matches?Math.round(p.wins/p.matches*100)+"%":"0%",avg:p.matches?Math.round(p.eloSum/p.matches):"—",best:disp(p.best)}));
-document.getElementById("oStatsTable").innerHTML=`<table><tr><th>Player</th><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Average Elo</th><th>Best Elo</th></tr>${oRows.map(r=>`<tr><td>${r.p}</td><td>${r.m}</td><td>${r.w}</td><td>${r.l}</td><td>${r.d}</td><td>${r.wr}</td><td>${r.avg}</td><td>${r.best}</td></tr>`).join("")}</table>`}
+document.getElementById("oStatsTable").innerHTML=`<table class="stats"><tr><th>Player</th><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Average Elo</th><th>Best Elo</th></tr>${oRows.map(r=>`<tr><td data-label="Player">${r.p}</td><td data-label="Matches">${r.m}</td><td data-label="Wins">${r.w}</td><td data-label="Losses">${r.l}</td><td data-label="Draws">${r.d}</td><td data-label="Win rate">${r.wr}</td><td data-label="Average Elo">${r.avg}</td><td data-label="Best Elo">${r.best}</td></tr>`).join("")}</table>`}
 function renderHistory(){document.getElementById("hist").innerHTML=history.length?history.map((h,i)=>`<div class="panel"><b>${h.white} vs ${h.black}</b><br>${h.date}<br>${h.result} • ${h.reason} • ${h.moves} moves<br>Elo: ${h.white} ${h.whiteElo} (${h.whiteChange>=0?"+":""}${h.whiteChange}) | ${h.black} ${h.blackElo} (${h.blackChange>=0?"+":""}${h.blackChange})<br><small>${h.movesList.join(" ")}</small><br><button onclick='openReplay(${JSON.stringify(h).replace(/'/g,"&#39;")})'>Watch Replay</button></div>`).join(""):"No games yet"}
+let hostUnlocked=false;
+function setHostPin(){let v=document.getElementById("hostPin").value.trim();if(v.length<4)return alert("PIN must be at least 4 characters");localStorage.setItem("dc_hostpin",v);hostUnlocked=true;renderProfile()}
+function hostLogin(){let v=document.getElementById("hostPin").value.trim();if(v!==localStorage.getItem("dc_hostpin"))return alert("Wrong PIN");hostUnlocked=true;renderProfile()}
+function hostLogout(){hostUnlocked=false;renderProfile()}
 function saveProfile(){profile.name=document.getElementById("pname").value;localStorage.setItem("dc_profile",JSON.stringify(profile));renderProfile()}
-function resetAll(){if(!profile.name)return alert("Save your profile first — only the host can reset.");if(!confirm("Reset ALL stats, history and tournaments? This cannot be undone."))return;players=[];history=[];tournament={players:[],fixtures:[],results:{},done:false};saveAll();renderHome();renderStats();renderTournament();renderHistory();renderProfile();alert("All stats reset.")}
+function resetAll(){if(!hostUnlocked)return alert("Only the host can clear stats.");if(!confirm("Reset ALL stats, history and tournaments? This cannot be undone."))return;players=[];history=[];tournament={players:[],fixtures:[],results:{},done:false};saveAll();renderHome();renderStats();renderTournament();renderHistory();renderProfile();alert("All stats reset.")}
 function renderProfile(){document.getElementById("pname").value=profile.name;
-document.getElementById("hostArea").innerHTML=profile.name?`<button class="ghost" onclick="resetAll()">Reset All Stats (Host only)</button>`:"";
+const hp=localStorage.getItem("dc_hostpin");
+document.getElementById("hostArea").innerHTML=!hp?`<p class="status">Host controls</p><input id="hostPin" type="password" placeholder="Create a host PIN (4+ characters)"><button class="ghost" onclick="setHostPin()">Become Host</button>`:(hostUnlocked?`<p class="status">Host controls (unlocked)</p><div class="row"><button onclick="resetAll()">Clear All Stats</button><button class="ghost" onclick="hostLogout()">Lock</button></div>`:`<p class="status">Host controls</p><input id="hostPin" type="password" placeholder="Enter host PIN"><button class="ghost" onclick="hostLogin()">Host Login</button>`);
 let p=players.find(x=>x.name.toLowerCase()==profile.name.toLowerCase());
 if(!p){document.getElementById("myOverall").innerHTML="<p>No rated games yet.</p>";document.getElementById("myTournament").innerHTML="<p>No tournament games yet.</p>";return}
 document.getElementById("myOverall").innerHTML=`<table><tr><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Best Elo</th></tr><tr><td>${p.matches}</td><td>${p.wins}</td><td>${p.losses}</td><td>${p.draws}</td><td>${p.matches?Math.round(p.wins/p.matches*100)+"%":"0%"}</td><td>${disp(p.best)}</td></tr></table>`;
 document.getElementById("myTournament").innerHTML=`<table><tr><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Best Elo</th><th>Tournaments won</th><th>Tournament points</th></tr><tr><td>${p.tMatches}</td><td>${p.tWins}</td><td>${p.tLosses}</td><td>${p.tDraws}</td><td>${p.tMatches?Math.round(p.tWins/p.tMatches*100)+"%":"0%"}</td><td>${disp(p.tBest)}</td><td>${p.tournamentsWon||0}</td><td>${tournament.results[p.name]||0}</td></tr></table>`}
+
+function createOnlineRoom(){
+const name=document.getElementById('onlineName').value.trim();
+if(!name)return alert('Enter your name');
+if(typeof socket==="undefined")return alert('Online server not connected yet.');
+localStorage.setItem('myName',name);
+socket.emit('createRoom',{name},res=>{
+document.getElementById('hostRoom').classList.remove('hidden');
+document.getElementById('joinRoom').classList.add('hidden');
+document.getElementById('spectateRoom').classList.add('hidden');
+document.getElementById('hostCode').innerText=res.code;
+});
+}
+function showJoinRoom(){document.getElementById('joinRoom').classList.remove('hidden');document.getElementById('hostRoom').classList.add('hidden');document.getElementById('spectateRoom').classList.add('hidden')}
+function showSpectateRoom(){document.getElementById('spectateRoom').classList.remove('hidden');document.getElementById('hostRoom').classList.add('hidden');document.getElementById('joinRoom').classList.add('hidden')}
+function joinAsPlayer(){
+const name=document.getElementById('onlineName').value.trim();
+const code=document.getElementById('joinCodeInput').value.trim().toUpperCase();
+if(!name||!code)return alert('Enter name and room code');
+if(typeof socket==="undefined")return alert('Online server not connected yet.');
+socket.emit('joinRoom',{code,name},res=>{
+if(res.error)return alert(res.error);
+if(res.joined==='player')startOnlineGame();
+else alert('Match already started. Use Spectate.');
+});
+}
+function joinAsSpectator(){
+const name=document.getElementById('onlineName').value.trim();
+const code=document.getElementById('spectateCodeInput').value.trim().toUpperCase();
+if(!name||!code)return alert('Enter name and room code');
+if(typeof socket==="undefined")return alert('Online server not connected yet.');
+socket.emit('joinRoom',{code,name},res=>{
+if(res.error)return alert(res.error);
+startSpectatorMode();
+});
+}
+function copyRoomLink(){
+const code=document.getElementById('hostCode').innerText;
+navigator.clipboard.writeText(location.origin+'?room='+code);
+alert('Invite link copied');
+}
+function startOnlineGame(){
+isSpectator=false;
+document.getElementById('chatPanel').style.display='block';
+go('play');
+showGameScreen();
+}
+function startSpectatorMode(){
+isSpectator=true;
+document.getElementById('chatPanel').style.display='none';
+go('play');
+showGameScreen();
+}
+
 renderHome();renderStats();renderTournament();renderHistory();renderProfile();
 </script>
 </body>
