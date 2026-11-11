@@ -140,6 +140,7 @@ th{color:#5eead4;cursor:pointer}
 <div class="game">
 <div class="left">
 <div class="panel"><b id="topName"></b><div class="caps" id="topCaps"></div></div>
+<div id="turnText" style="text-align:center;font-weight:bold;margin-bottom:10px"></div>
 <div class="board" id="board"></div>
 <div class="panel"><b id="bottomName"></b><div class="caps" id="bottomCaps"></div></div>
 <div class="row">
@@ -231,6 +232,7 @@ let replay={moves:[],index:0,tags:[],white:"",black:""};
 let lastRecord=null;
 let isSpectator=false;
 let myColor='w';
+let myRoom=null;
 const pieceImg=(c,p)=>`https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${c}${p}.png`;
 const value={p:1,n:3,b:3,r:5,q:9,k:0};
 const disp=v=>v??"—";
@@ -358,6 +360,7 @@ document.getElementById('hostRoom').classList.remove('hidden');
 document.getElementById('joinRoom').classList.add('hidden');
 document.getElementById('spectateRoom').classList.add('hidden');
 document.getElementById('hostCode').innerText=res.code;
+myRoom=res.code;
 });
 }
 function showJoinRoom(){document.getElementById('joinRoom').classList.remove('hidden');document.getElementById('hostRoom').classList.add('hidden');document.getElementById('spectateRoom').classList.add('hidden')}
@@ -365,12 +368,16 @@ function showSpectateRoom(){document.getElementById('spectateRoom').classList.re
 function joinAsPlayer(){
 const name=document.getElementById('onlineName').value.trim();
 const code=document.getElementById('joinCodeInput').value.trim().toUpperCase();
+myRoom=res.code;
+myColor=res.color;
 if(!name||!code)return alert('Enter name and room code');
 if(typeof socket==="undefined")return alert('Online server not connected yet.');
 socket.emit('joinRoom',{code,name},res=>{
 if(res.error)return alert(res.error);
+isSpectator=res.spectator||false;
 if(res.joined==='player'){
 myColor=res.color;
+myRoom=res.code;
 startOnlineGame(res.color);
 }else alert('Match already started. Use Spectate.');
 });
@@ -391,6 +398,10 @@ navigator.clipboard.writeText(location.origin+'?room='+code);
 alert('Invite link copied');
 }
 socket.on('roomUpdate', (room) => {
+isSpectator=room.spectators.includes(socket.id);
+updateTurnUI();
+render();
+if(isSpectator){document.getElementById('board').style.pointerEvents='none';}else{document.getElementById('board').style.pointerEvents='auto';}
 if(room.players.length===2){
 startOnlineGame('w');
 }
@@ -411,8 +422,14 @@ document.getElementById('chat').innerHTML="";
 go('play');
 showGameScreen();
 render();
+updateTurnUI();
+}
+function updateTurnUI(){
+if(!myRoom)return;
+document.getElementById('turnText').innerText=(myColor==='w'?'White':'Black')+' to move';
 }
 function startSpectatorMode(){
+myRoom=null;
 isSpectator=true;
 document.getElementById('chatPanel').style.display='none';
 go('play');
