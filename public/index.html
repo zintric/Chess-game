@@ -104,6 +104,11 @@ th{color:#5eead4;cursor:pointer}
 <button class="ghost" onclick="showJoinRoom()">Join</button>
 <button class="ghost" onclick="showSpectateRoom()">Spectate</button>
 </div>
+<div id="lobbyBox" class="online-box">
+<p><b>Online Players:</b> <span id="onlineCount">0</span></p>
+<h3>Live Matches</h3>
+<div id="liveRooms">No waiting matches</div>
+</div>
 <div id="hostRoom" class="online-box hidden">
 <p>Room Code</p>
 <div class="room-code" id="hostCode"></div>
@@ -225,6 +230,7 @@ let match={white:"",black:"",over:false,result:"",reason:"",tournament:false,fix
 let replay={moves:[],index:0,tags:[],white:"",black:""};
 let lastRecord=null;
 let isSpectator=false;
+let myColor='w';
 const pieceImg=(c,p)=>`https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${c}${p}.png`;
 const value={p:1,n:3,b:3,r:5,q:9,k:0};
 const disp=v=>v??"—";
@@ -321,12 +327,33 @@ if(!p){document.getElementById("myOverall").innerHTML="<p>No rated games yet.</p
 document.getElementById("myOverall").innerHTML=`<table><tr><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Best Elo</th></tr><tr><td>${p.matches}</td><td>${p.wins}</td><td>${p.losses}</td><td>${p.draws}</td><td>${p.matches?Math.round(p.wins/p.matches*100)+"%":"0%"}</td><td>${disp(p.best)}</td></tr></table>`;
 document.getElementById("myTournament").innerHTML=`<table><tr><th>Matches</th><th>Wins</th><th>Losses</th><th>Draws</th><th>Win rate</th><th>Best Elo</th><th>Tournaments won</th><th>Tournament points</th></tr><tr><td>${p.tMatches}</td><td>${p.tWins}</td><td>${p.tLosses}</td><td>${p.tDraws}</td><td>${p.tMatches?Math.round(p.tWins/p.tMatches*100)+"%":"0%"}</td><td>${disp(p.tBest)}</td><td>${p.tournamentsWon||0}</td><td>${tournament.results[p.name]||0}</td></tr></table>`}
 
+socket.on('lobbyUpdate',data=>{
+document.getElementById('onlineCount').innerText=data.online;
+let box=document.getElementById('liveRooms');
+if(!data.rooms.length){
+box.innerHTML='No waiting matches';
+}else{
+box.innerHTML=data.rooms.map(r=>`<div class="panel"><b>${r.host}</b> is waiting<br><button onclick="joinWaitingRoom('${r.code}')">Join</button></div>`).join('');
+}
+});
+
+function joinWaitingRoom(code){
+const name=document.getElementById('onlineName').value.trim();
+if(!name)return alert('Enter your name');
+localStorage.setItem('myName',name);
+socket.emit('joinWaitingRoom',{code,name},res=>{
+if(res.error)return alert(res.error);
+myColor=res.color;
+startOnlineGame(res.color);
+});
+}
 function createOnlineRoom(){
 const name=document.getElementById('onlineName').value.trim();
 if(!name)return alert('Enter your name');
 if(typeof socket==="undefined")return alert('Online server not connected yet.');
 localStorage.setItem('myName',name);
 socket.emit('createRoom',{name},res=>{
+myColor=res.color;
 document.getElementById('hostRoom').classList.remove('hidden');
 document.getElementById('joinRoom').classList.add('hidden');
 document.getElementById('spectateRoom').classList.add('hidden');
@@ -342,8 +369,10 @@ if(!name||!code)return alert('Enter name and room code');
 if(typeof socket==="undefined")return alert('Online server not connected yet.');
 socket.emit('joinRoom',{code,name},res=>{
 if(res.error)return alert(res.error);
-if(res.joined==='player')startOnlineGame();
-else alert('Match already started. Use Spectate.');
+if(res.joined==='player'){
+myColor=res.color;
+startOnlineGame(res.color);
+}else alert('Match already started. Use Spectate.');
 });
 }
 function joinAsSpectator(){
@@ -362,13 +391,18 @@ navigator.clipboard.writeText(location.origin+'?room='+code);
 alert('Invite link copied');
 }
 socket.on('roomUpdate', (room) => {
-  if (room.players.length === 2) {
-    startOnlineGame();
-  }
+if(room.players.length===2){
+startOnlineGame('w');
+}
 });
-function startOnlineGame(){
+function startOnlineGame(color='w'){
 isSpectator=false;
-match={white:"Player 1",black:"Player 2",over:false,result:"",reason:"",tournament:false,fixtureIndex:-1};
+const myName=localStorage.getItem('myName')||'Player';
+if(color==='w'){
+match={white:myName,black:'Opponent',over:false,result:"",reason:"",tournament:false,fixtureIndex:-1};
+}else{
+match={white:'Opponent',black:myName,over:false,result:"",reason:"",tournament:false,fixtureIndex:-1};
+}
 game=new Chess();
 viewIndex=0;
 selected=null;
