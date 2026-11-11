@@ -209,6 +209,11 @@ th{color:#5eead4;cursor:pointer}
 <div id="promoModal" class="modal" style="display:none"><div class="card"><h3>Choose Promotion</h3><div class="promo" id="promoChoices"></div></div></div>
 <div id="endModal" class="modal" style="display:none"><div class="card"><h3 id="endTitle"></h3><p id="endReason"></p><p id="endCounts"></p><button onclick="watchReplay()">Watch Replay</button></div></div>
 
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+</script>
+
 <script>
 let game=(typeof Chess!=="undefined")?new Chess():null;
 let viewIndex=0,selected=null,flipped=false,pendingPromo=null;
