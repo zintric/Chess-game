@@ -361,6 +361,11 @@ const code=document.getElementById('hostCode').innerText;
 navigator.clipboard.writeText(location.origin+'?room='+code);
 alert('Invite link copied');
 }
+socket.on('roomUpdate', (room) => {
+  if (room.players.length === 2) {
+    startOnlineGame();
+  }
+});
 function startOnlineGame(){
 isSpectator=false;
 document.getElementById('chatPanel').style.display='block';
