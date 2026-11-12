@@ -33,7 +33,8 @@ function joinRoom() {
 
 socket.on('roomUpdate', (room) => {
   const players = room.players.map(p => p.name).join(' vs ');
-  document.getElementById('players').innerText = players || 'Waiting for players...';
+  document.getElementById('players').innerHTML =
+  '<span class="player-timer" id="whiteTimer">10:00</span> vs <span class="player-timer" id="blackTimer">10:00</span>';
 });
 
 socket.on('lobbyUpdate', (data) => {
@@ -105,8 +106,8 @@ function sendEmote(emote) {
   socket.emit('emote', { code: roomCode, name: myName, emote });
 }
 socket.on('timerUpdate', (data) => {
-  document.getElementById('whiteTime').textContent = formatTime(data.whiteTime);
-  document.getElementById('blackTime').textContent = formatTime(data.blackTime);
+  document.getElementById('whiteTimer').textContent = formatTime(data.whiteTime);
+  document.getElementById('blackTimer').textContent = formatTime(data.blackTime);
 });
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
