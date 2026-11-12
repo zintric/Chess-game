@@ -102,6 +102,7 @@ io.on('connection', (socket) => {
     room.lastMoveTime = Date.now();
 
     cb({ joined: 'player', code, color: 'b' });
+    io.to(code).emit('roomReady', { code, hostColor: 'w' });
     io.to(code).emit('roomUpdate', {
       code,
       players: room.players,
