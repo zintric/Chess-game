@@ -104,3 +104,12 @@ function sendChat() {
 function sendEmote(emote) {
   socket.emit('emote', { code: roomCode, name: myName, emote });
 }
+socket.on('timerUpdate', (data) => {
+  document.getElementById('whiteTime').textContent = formatTime(data.whiteTime);
+  document.getElementById('blackTime').textContent = formatTime(data.blackTime);
+});
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return minutes + ':' + String(secs).padStart(2, '0');
+}
