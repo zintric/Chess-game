@@ -162,6 +162,7 @@ io.on('connection', (socket) => {
 
 setInterval(() => {
   const now = Date.now();
+  console.log('TIMER TICK');
 
   for (const code in rooms) {
     const room = rooms[code];
