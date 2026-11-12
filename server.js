@@ -186,6 +186,7 @@ if (secondsPassed > 0) {
       room.lastMoveTime = now;
     }
 
+    console.log('SENDING TIMER UPDATE');
     io.to(code).emit('timerUpdate', {
       whiteTime: room.whiteTime,
       blackTime: room.blackTime,
