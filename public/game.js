@@ -108,6 +108,15 @@ function sendEmote(emote) {
 socket.on('timerUpdate', (data) => {
   document.getElementById('topTimer').textContent = formatTime(data.blackTime);
   document.getElementById('bottomTimer').textContent = formatTime(data.whiteTime);
+  if (data.turn === 'w') {
+    data.whiteTime = data.whiteTime - 1;
+  } else {
+    data.blackTime = data.blackTime - 1;
+  }
+  setTimeout(() => {
+    document.getElementById('topTimer').textContent = formatTime(data.blackTime);
+    document.getElementById('bottomTimer').textContent = formatTime(data.whiteTime);
+  }, 1000);
 });
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
