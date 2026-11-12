@@ -400,13 +400,27 @@ navigator.clipboard.writeText(location.origin+'?room='+code);
 alert('Invite link copied');
 }
 socket.on('roomUpdate', (room) => {
-isSpectator=room.spectators.includes(socket.id);
+isSpectator=(room.spectators||[]).includes(socket.id);
 updateTurnUI();
 render();
 if(isSpectator){document.getElementById('board').style.pointerEvents='none';}else{document.getElementById('board').style.pointerEvents='auto';}
-if(room.players.length===2){
+if(room.players&&room.players.length===2){
 startOnlineGame('w');
 }
+});
+
+socket.on('timerUpdate', (data) => {
+if(!data)return;
+let whiteTime=data.whiteTime;
+let blackTime=data.blackTime;
+if(whiteTime==null)whiteTime=0;
+if(blackTime==null)blackTime=0;
+let w=Math.max(0,Math.floor(whiteTime));
+let b=Math.max(0,Math.floor(blackTime));
+let wt=Math.floor(w/60)+':'+String(w%60).padStart(2,'0');
+let bt=Math.floor(b/60)+':'+String(b%60).padStart(2,'0');
+document.getElementById('topTimer').innerText=wt;
+document.getElementById('bottomTimer').innerText=bt;
 });
 function startOnlineGame(color='w'){
 isSpectator=false;
