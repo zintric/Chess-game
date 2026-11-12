@@ -171,22 +171,18 @@ setInterval(() => {
 
     const secondsPassed = Math.floor((now - room.lastMoveTime) / 1000);
 
-if (secondsPassed > 0) {
-  if (room.turn === 'w') {
-    room.whiteTime = Math.max(0, room.whiteTime - secondsPassed);
-  } else {
-    room.blackTime = Math.max(0, room.blackTime - secondsPassed);
-  }
-  io.to(code).emit('timerUpdate', {
-  whiteTime: room.whiteTime,
-  blackTime: room.blackTime,
-  turn: room.turn
-});
+    if (secondsPassed > 0) {
+      if (room.turn === 'w') {
+        room.whiteTime = Math.max(0, room.whiteTime - secondsPassed);
+      } else {
+        room.blackTime = Math.max(0, room.blackTime - secondsPassed);
+      }
 
       room.lastMoveTime = now;
     }
 
     console.log('SENDING TIMER UPDATE');
+
     io.to(code).emit('timerUpdate', {
       whiteTime: room.whiteTime,
       blackTime: room.blackTime,
@@ -195,17 +191,18 @@ if (secondsPassed > 0) {
 
     if (room.whiteTime <= 0) {
       room.status = 'finished';
-      io.to(code).emit('gameOver', { winner: 'black', reason: 'White ran out of time' });
+      io.to(code).emit('gameOver', {
+        winner: 'black',
+        reason: 'White ran out of time'
+      });
     }
 
     if (room.blackTime <= 0) {
       room.status = 'finished';
-      io.to(code).emit('gameOver', { winner: 'white', reason: 'Black ran out of time' });
+      io.to(code).emit('gameOver', {
+        winner: 'white',
+        reason: 'Black ran out of time'
+      });
     }
   }
 }, 1000);
-
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log('Server running on port ' + PORT);
-});
