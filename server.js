@@ -17,6 +17,7 @@ function roomList() {
     .map(room => ({
       code: room.code,
       host: room.players[0] ? room.players[0].name : 'Player',
+      hostId: room.players[0] ? room.players[0].id : null,
       players: room.players.length
     }));
 }
