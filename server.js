@@ -170,12 +170,17 @@ setInterval(() => {
 
     const secondsPassed = Math.floor((now - room.lastMoveTime) / 1000);
 
-    if (secondsPassed > 0) {
-      if (room.turn === 'w') {
-        room.whiteTime = Math.max(0, room.whiteTime - secondsPassed);
-      } else {
-        room.blackTime = Math.max(0, room.blackTime - secondsPassed);
-      }
+if (secondsPassed > 0) {
+  if (room.turn === 'w') {
+    room.whiteTime = Math.max(0, room.whiteTime - secondsPassed);
+  } else {
+    room.blackTime = Math.max(0, room.blackTime - secondsPassed);
+  }
+  io.to(code).emit('timerUpdate', {
+  whiteTime: room.whiteTime,
+  blackTime: room.blackTime,
+  turn: room.turn
+});
 
       room.lastMoveTime = now;
     }
