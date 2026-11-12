@@ -36,6 +36,34 @@ socket.on('roomUpdate', (room) => {
   document.getElementById('players').innerText = players || 'Waiting for players...';
 });
 
+socket.on('lobbyUpdate', (data) => {
+  const onlineCount = document.getElementById('onlineCount');
+  const liveRooms = document.getElementById('liveRooms');
+
+  if (onlineCount) {
+    onlineCount.innerText = data.online;
+  }
+
+  if (liveRooms) {
+    if (!data.rooms || data.rooms.length === 0) {
+      liveRooms.innerText = 'No waiting matches';
+      return;
+    }
+
+    liveRooms.innerText = '';
+
+    data.rooms.forEach(room => {
+      if (room.hostId === socket.id) return;
+
+      const button = document.createElement('button');
+      button.innerText = 'Join ' + room.host + "'s match";
+      button.onclick = () => joinWaitingRoom(room.code);
+
+      liveRooms.appendChild(button);
+    });
+  }
+});
+
 socket.on('move', (move) => {
   applyRemoteMove(move);
 });
@@ -47,6 +75,19 @@ socket.on('chat', (data) => {
 socket.on('emote', (data) => {
   addChat(data.name + ' sent ' + data.emote);
 });
+
+function joinWaitingRoom(code) {
+  const name = document.getElementById('playerName').value.trim();
+
+  if (!name) return alert('Enter your name');
+
+  socket.emit('joinWaitingRoom', { code, name }, (res) => {
+    if (res.error) return alert(res.error);
+
+    roomCode = res.code;
+    myRole = res.joined;
+  });
+}
 
 function sendMove(move) {
   if (myRole !== 'player') return;
