@@ -350,6 +350,11 @@ startOnlineGame(res.color);
 });
 }
 function createOnlineRoom(){
+socket.on('roomReady',data=>{
+myColor=data.hostColor;
+myRoom=data.code;
+startOnlineGame(myColor);
+});
 const name=document.getElementById('onlineName').value.trim();
 if(!name)return alert('Enter your name');
 if(typeof socket==="undefined")return alert('Online server not connected yet.');
@@ -368,8 +373,6 @@ function showSpectateRoom(){document.getElementById('spectateRoom').classList.re
 function joinAsPlayer(){
 const name=document.getElementById('onlineName').value.trim();
 const code=document.getElementById('joinCodeInput').value.trim().toUpperCase();
-myRoom=res.code;
-myColor=res.color;
 if(!name||!code)return alert('Enter name and room code');
 if(typeof socket==="undefined")return alert('Online server not connected yet.');
 socket.emit('joinRoom',{code,name},res=>{
