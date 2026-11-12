@@ -106,8 +106,8 @@ function sendEmote(emote) {
   socket.emit('emote', { code: roomCode, name: myName, emote });
 }
 socket.on('timerUpdate', (data) => {
-  document.getElementById('whiteTimer').textContent = formatTime(data.whiteTime);
-  document.getElementById('blackTimer').textContent = formatTime(data.blackTime);
+  document.getElementById('topTimer').textContent = formatTime(data.blackTime);
+  document.getElementById('bottomTimer').textContent = formatTime(data.whiteTime);
 });
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
