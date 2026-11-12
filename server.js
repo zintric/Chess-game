@@ -187,10 +187,12 @@ setInterval(() => {
     });
 
     if (room.whiteTime <= 0) {
+      room.status = 'finished';
       io.to(code).emit('gameOver', { winner: 'black', reason: 'White ran out of time' });
     }
 
     if (room.blackTime <= 0) {
+      room.status = 'finished';
       io.to(code).emit('gameOver', { winner: 'white', reason: 'Black ran out of time' });
     }
   }
